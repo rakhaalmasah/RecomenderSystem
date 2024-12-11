@@ -475,10 +475,3 @@ Hasil rekomendasi:
 1. **Collaborative Filtering** menghasilkan rekomendasi yang sangat personal tetapi memerlukan data interaksi yang memadai.
 2. **Content-Based Filtering** memberikan rekomendasi berdasarkan atribut konten, cocok untuk pengguna baru atau item baru.
 3. Kombinasi kedua pendekatan dalam *hybrid recommendation system* dapat mengatasi kekurangan masing-masing metode untuk hasil yang lebih optimal.
-
-
-**---Ini adalah bagian akhir laporan---**
-
-_Catatan:_
-- _Anda dapat menambahkan gambar, kode, atau tabel ke dalam laporan jika diperlukan. Temukan caranya pada contoh dokumen markdown di situs editor [Dillinger](https://dillinger.io/), [Github Guides: Mastering markdown](https://guides.github.com/features/mastering-markdown/), atau sumber lain di internet. Semangat!_
-- Jika terdapat penjelasan yang harus menyertakan code snippet, tuliskan dengan sewajarnya. Tidak perlu menuliskan keseluruhan kode project, cukup bagian yang ingin dijelaskan saja.
