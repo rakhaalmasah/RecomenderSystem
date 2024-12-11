@@ -48,7 +48,7 @@ Tujuan dari proyek ini adalah untuk membangun sistem rekomendasi buku berbasis m
 Untuk mencapai tujuan tersebut, digunakan dua pendekatan utama dalam membangun sistem rekomendasi, yaitu content-based filtering dan collaborative filtering. Berikut adalah penjelasan kedua metode:
 - **Solution 1: Content-Based Filtering**
 
-  Pendekatan collaborative filtering bekerja dengan menganalisis pola interaksi pengguna, seperti rating atau ulasan, untuk memberikan rekomendasi. Sistem ini memanfaatkan kemiripan antara pengguna atau item untuk           menghasilkan rekomendasi.
+  Pendekatan content-based filtering bekerja dengan merekomendasikan buku berdasarkan karakteristik kontennya, seperti nama penulis, genre, atau deskripsi buku. Sistem ini memanfaatkan metadata buku dan menganalisis kesamaan antar buku untuk memberikan rekomendasi.
 
 - **Solution 2: Collaborative Filtering**
 
