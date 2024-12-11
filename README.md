@@ -469,35 +469,6 @@ $$
 - **Content-Based Filtering:** Memberikan rekomendasi berdasarkan atribut konten, cocok untuk pengguna baru tetapi memiliki keterbatasan dalam menangkap pola perilaku pengguna lainnya.
 - Kombinasi kedua pendekatan dalam *hybrid recommendation system* dapat mengatasi kekurangan masing-masing metode, memberikan hasil yang lebih baik.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Pada bagian ini Anda perlu menyebutkan metrik evaluasi yang digunakan. Kemudian, jelaskan hasil proyek berdasarkan metrik evaluasi tersebut.
-
-Ingatlah, metrik evaluasi yang digunakan harus sesuai dengan konteks data, problem statement, dan solusi yang diinginkan.
-
-**Rubrik/Kriteria Tambahan (Opsional)**: 
-- Menjelaskan formula metrik dan bagaimana metrik tersebut bekerja.
-
 **---Ini adalah bagian akhir laporan---**
 
 _Catatan:_
