@@ -318,10 +318,7 @@ Pada bab ini, dua pendekatan utama digunakan untuk membangun sistem rekomendasi,
 
 #### **Hasil Model**
 
-1. **Grafik Training dan Validation Loss**
-![Training and Validation Loss](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/training%20val%20loss.png)
-
-2. **Top-N Recommendation**
+1. **Top-N Recommendation**
    - Model menghasilkan rekomendasi buku untuk pengguna tertentu. Berikut adalah hasil rekomendasi untuk dua pengguna:
      - **User-ID: 11676**
        ![Recommendation for User-ID 11676](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/Rekomendasi_11676.png)
