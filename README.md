@@ -285,7 +285,7 @@ data['metadata'] = data['metadata'].fillna('')  # Handle NaN values
 4. **Meningkatkan Akurasi Model**
    - Data yang relevan dan bebas dari noise meningkatkan performa model dalam memberikan rekomendasi.
 
---
+---
 
 ## Modeling
 Tahapan ini membahas mengenai model sisten rekomendasi yang Anda buat untuk menyelesaikan permasalahan. Sajikan top-N recommendation sebagai output.
