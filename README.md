@@ -122,6 +122,7 @@ Berikut adalah penjelasan variabel dalam dataset gabungan yang digunakan untuk a
 
 Grafik ini menunjukkan 10 pengguna yang paling sering memberikan rating.
 
+![Top 10 Pengguna Paling Aktif](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/main/download.png)
 
 **Insight**:
 - Terdapat beberapa pengguna yang sangat aktif, memberikan ribuan rating, yang dapat menjadi acuan kuat untuk membangun model berbasis *collaborative filtering*.
