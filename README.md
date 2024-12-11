@@ -128,11 +128,6 @@ Grafik ini menunjukkan 10 pengguna yang paling sering memberikan rating.
 
 ---
 
-**Insight**:
-- Beberapa buku seperti seri *Harry Potter* sering kali memiliki jumlah rating yang sangat tinggi, menunjukkan popularitasnya di kalangan pengguna.
-
----
-
 ### **5. Exploratory Data Analysis (EDA)**
 
 #### **5.1 Statistik Deskriptif**
