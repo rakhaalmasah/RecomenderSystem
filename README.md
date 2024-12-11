@@ -388,6 +388,109 @@ Pemilihan algoritma bergantung pada kebutuhan dan ketersediaan data. Kombinasi k
 ---
 
 ## Evaluation
+
+Evaluasi dilakukan untuk mengukur kinerja dua pendekatan sistem rekomendasi yang telah diterapkan, yaitu *collaborative filtering* dan *content-based filtering*. Metrik evaluasi yang digunakan disesuaikan dengan tujuan proyek, yaitu menghasilkan rekomendasi yang relevan bagi pengguna.
+
+---
+
+### **1. Metrik Evaluasi Collaborative Filtering**
+
+#### **Metrik: Weighted Mean Squared Error (Weighted MSE)**
+
+Weighted MSE digunakan untuk mengukur perbedaan rata-rata kuadrat antara nilai rating aktual dan prediksi rating yang dihasilkan oleh model *collaborative filtering*, dengan memberikan bobot lebih tinggi pada rating non-nol. Rating non-nol mencerminkan preferensi eksplisit pengguna sehingga dianggap lebih penting dalam evaluasi.
+
+#### **Formula Weighted MSE**
+$$
+\text{Weighted MSE} = \frac{1}{n} \sum_{i=1}^n w_i (y_i - \hat{y}_i)^2
+$$
+
+- **$y_i$**: Rating aktual.
+- **$\hat{y}_i$**: Rating yang diprediksi oleh model.
+- **$w_i$**: Bobot untuk setiap sampel:
+  - **5.0** untuk rating non-nol (mengindikasikan preferensi eksplisit).
+  - **1.0** untuk rating nol.
+- **$n$**: Jumlah data.
+
+#### **Cara Kerja Metrik**
+1. Model memprediksi rating buku berdasarkan embedding pengguna dan buku.
+2. Perbedaan antara rating aktual dan prediksi dihitung untuk setiap data.
+3. Perbedaan tersebut dikalikan dengan bobot yang sesuai, di mana rating non-nol memiliki bobot lebih tinggi.
+4. Selisih berbobot tersebut dikuadratkan, dijumlahkan, dan dirata-rata untuk menghasilkan nilai Weighted MSE.
+
+#### **Hasil Evaluasi Collaborative Filtering**
+- **Weighted MSE Training:** 0.0012
+- **Weighted MSE Validation:** 0.0011
+- **Interpretasi Hasil:**
+  - Nilai Weighted MSE yang rendah menunjukkan bahwa prediksi model mendekati rating aktual yang diberikan pengguna, terutama untuk data yang lebih penting (rating non-nol).
+  - Perbedaan antara *training loss* dan *validation loss* menunjukkan model telah terlatih dengan baik tanpa overfitting.
+
+---
+
+### **2. Metrik Evaluasi Content-Based Filtering**
+
+#### **Metrik: Precision at K (Precision@K)**
+
+Precision@K digunakan untuk mengukur proporsi buku yang relevan dalam daftar rekomendasi teratas (*top-K recommendation*).
+
+#### **Formula Precision@K**
+$$
+\text{Precision@K} = \frac{| \text{Relevan dalam Top-K} |}{K}
+$$
+
+- **$|\text{Relevan dalam Top-K}|$**: Jumlah buku relevan dalam rekomendasi teratas.
+- **$K$**: Jumlah buku dalam daftar rekomendasi teratas.
+
+#### **Cara Kerja Metrik**
+1. Model memberikan rekomendasi berdasarkan kemiripan konten menggunakan *cosine similarity*.
+2. Daftar buku rekomendasi dibandingkan dengan preferensi pengguna (buku yang telah diberi rating tinggi).
+3. Precision@K dihitung sebagai persentase buku relevan di antara daftar rekomendasi teratas.
+
+#### **Hasil Evaluasi Content-Based Filtering**
+- **Precision@5:** 80% (4 dari 5 buku relevan)
+- **Interpretasi Hasil:**
+  - Nilai Precision@5 menunjukkan sebagian besar buku dalam rekomendasi relevan dengan preferensi pengguna.
+  - Hasil ini menunjukkan kemampuan model dalam menghasilkan rekomendasi yang sesuai dengan konten buku.
+
+---
+
+### **3. Perbandingan Evaluasi Dua Pendekatan**
+
+| **Aspek**                | **Collaborative Filtering**                                     | **Content-Based Filtering**                                 |
+|--------------------------|-----------------------------------------------------------------|------------------------------------------------------------|
+| **Metrik Evaluasi**       | Weighted Mean Squared Error (Weighted MSE)                     | Precision@K                                                |
+| **Relevansi Rekomendasi** | Berdasarkan interaksi pengguna dan pola rating                 | Berdasarkan kesamaan atribut konten (penulis atau metadata) |
+| **Kekuatan**              | Sangat personal dan memanfaatkan pola perilaku pengguna lain.  | Tidak memerlukan data pengguna lain, cocok untuk pengguna baru. |
+| **Kelemahan**             | Tidak dapat merekomendasikan untuk item baru (*cold start*).   | Rentan terhadap masalah *overspecialization*.              |
+
+---
+
+### **Kesimpulan**
+- **Collaborative Filtering:** Efektif untuk menghasilkan rekomendasi personalisasi tinggi, dengan memprioritaskan data preferensi eksplisit menggunakan bobot pada rating non-nol. Namun, metode ini membutuhkan banyak data interaksi.
+- **Content-Based Filtering:** Memberikan rekomendasi berdasarkan atribut konten, cocok untuk pengguna baru tetapi memiliki keterbatasan dalam menangkap pola perilaku pengguna lainnya.
+- Kombinasi kedua pendekatan dalam *hybrid recommendation system* dapat mengatasi kekurangan masing-masing metode, memberikan hasil yang lebih baik.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Pada bagian ini Anda perlu menyebutkan metrik evaluasi yang digunakan. Kemudian, jelaskan hasil proyek berdasarkan metrik evaluasi tersebut.
 
 Ingatlah, metrik evaluasi yang digunakan harus sesuai dengan konteks data, problem statement, dan solusi yang diinginkan.
