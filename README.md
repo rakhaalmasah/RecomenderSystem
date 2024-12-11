@@ -4,8 +4,6 @@
 
 Sistem rekomendasi buku adalah alat yang memanfaatkan algoritma untuk menyarankan buku kepada pengguna berdasarkan preferensi dan perilaku mereka. Dalam era digital saat ini, di mana informasi dan pilihan buku sangat melimpah, pembaca sering menghadapi kesulitan dalam menentukan buku apa yang akan dibaca selanjutnya. Hal ini dapat menyebabkan kebingungan dan keputusan yang kurang optimal dalam pemilihan buku.
 
-**Rubrik/Kriteria Tambahan (Opsional)**:
-
 Penerapan sistem rekomendasi buku menjadi penting karena beberapa alasan:
   1. Meningkatkan Pengalaman Pengguna: Dengan memberikan saran buku yang sesuai dengan minat dan preferensi individu, sistem ini membantu pembaca menemukan buku yang relevan dan menarik, sehingga meningkatkan kepuasan dan keterlibatan mereka.
   2. Mengatasi Informasi yang Berlebihan: Di tengah banyaknya pilihan buku yang tersedia, sistem rekomendasi membantu menyaring dan menyoroti buku-buku yang paling sesuai dengan kebutuhan dan minat pengguna, mengurangi beban dalam proses pemilihan.
@@ -45,8 +43,6 @@ Tujuan dari proyek ini adalah untuk membangun sistem rekomendasi buku berbasis m
 - Meningkatkan Pengalaman Pengguna: Membuat pengalaman pengguna lebih personal dengan menghadirkan buku-buku yang menarik dan relevan.
 - Meningkatkan Retensi Pengguna: Dengan pengalaman yang lebih baik, sistem dapat mempertahankan lebih banyak pengguna dalam platform.
 
-**Rubrik/Kriteria Tambahan (Opsional)**:
-
 ### Solution statements
 
 Untuk mencapai tujuan tersebut, digunakan dua pendekatan utama dalam membangun sistem rekomendasi, yaitu content-based filtering dan collaborative filtering. Berikut adalah penjelasan kedua metode:
@@ -59,17 +55,108 @@ Untuk mencapai tujuan tersebut, digunakan dua pendekatan utama dalam membangun s
   Pendekatan collaborative filtering bekerja dengan menganalisis pola interaksi pengguna, seperti rating atau ulasan, untuk memberikan rekomendasi. Sistem ini memanfaatkan kemiripan antara pengguna atau item untuk menghasilkan rekomendasi.
 
 ## Data Understanding
-Paragraf awal bagian ini menjelaskan informasi mengenai jumlah data, kondisi data, dan informasi mengenai data yang digunakan. Sertakan juga sumber atau tautan untuk mengunduh dataset. Contoh: [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Restaurant+%26+consumer+data).
 
-Selanjutnya, uraikanlah seluruh variabel atau fitur pada data. Sebagai contoh:  
+### **1. Jumlah dan Kondisi Data**
 
-Variabel-variabel pada Restaurant UCI dataset adalah sebagai berikut:
-- accepts : merupakan jenis pembayaran yang diterima pada restoran tertentu.
-- cuisine : merupakan jenis masakan yang disajikan pada restoran.
-- dst
+Dataset yang digunakan dalam proyek ini merupakan dataset rekomendasi buku yang berisi informasi mengenai buku, pengguna, dan interaksi rating antara keduanya. Berikut adalah rincian jumlah data pada masing-masing file:
 
-**Rubrik/Kriteria Tambahan (Opsional)**:
-- Melakukan beberapa tahapan yang diperlukan untuk memahami data, contohnya teknik visualisasi data beserta insight atau exploratory data analysis.
+1. **Books Dataset (`Books.csv`)**:
+   - **Jumlah Data**: 271,360 entri
+   - **Kolom**: 8 kolom
+   - **Informasi Kolom**:
+     - `ISBN`: Nomor unik untuk setiap buku.
+     - `Book-Title`: Judul buku.
+     - `Book-Author`: Nama penulis buku.
+     - `Year-Of-Publication`: Tahun publikasi buku.
+     - `Publisher`: Penerbit buku.
+     - `Image-URL-S`, `Image-URL-M`, `Image-URL-L`: URL gambar sampul buku dalam berbagai resolusi.
+   - **Kondisi Data**:
+     - Data tidak memiliki nilai duplikasi.
+     - Terdapat nilai kosong pada kolom `Book-Author` (2 entri), `Publisher` (2 entri), dan `Image-URL-L` (3 entri).
+
+2. **Ratings Dataset (`Ratings.csv`)**:
+   - **Jumlah Data**: 1,149,780 entri
+   - **Kolom**: 3 kolom
+   - **Informasi Kolom**:
+     - `User-ID`: ID unik untuk setiap pengguna.
+     - `ISBN`: Nomor unik untuk setiap buku yang dirating.
+     - `Book-Rating`: Skor rating yang diberikan pengguna untuk buku (rentang 0-10).
+   - **Kondisi Data**:
+     - Tidak ada nilai kosong maupun duplikasi pada dataset ini.
+
+3. **Users Dataset (`Users.csv`)**:
+   - **Jumlah Data**: 278,858 entri
+   - **Kolom**: 3 kolom
+   - **Informasi Kolom**:
+     - `User-ID`: ID unik untuk setiap pengguna.
+     - `Location`: Lokasi pengguna.
+     - `Age`: Umur pengguna (opsional).
+   - **Kondisi Data**:
+     - Kolom `Age` memiliki banyak nilai kosong (110,762 entri).
+     - Tidak ada nilai duplikasi pada dataset ini.
+
+### **2. Sumber Data**
+
+- **Dataset Asli**: Dataset dapat diakses di [Kaggle Book Recommendation Dataset](https://www.kaggle.com/datasets/arashnic/book-recommendation-dataset).
+- **Dataset Siap Digunakan untuk Model Collaborative Filtering**: [Dataset Collaborative Filtering](https://drive.google.com/file/d/1ctcN847pFHwG1MOg8oVyLOXunt-4cV6Q/view?usp=sharing).
+
+### **3. Uraian Variabel**
+
+Berikut adalah penjelasan variabel dalam dataset gabungan yang digunakan untuk analisis dan pemodelan:
+
+| **Variabel**           | **Penjelasan**                                                                                   |
+|-------------------------|-------------------------------------------------------------------------------------------------|
+| `User-ID`              | ID unik pengguna yang memberikan rating pada buku tertentu.                                     |
+| `ISBN`                 | Nomor unik identifikasi buku.                                                                   |
+| `Book-Title`           | Judul buku yang dirating oleh pengguna.                                                         |
+| `Book-Author`          | Nama penulis buku.                                                                              |
+| `Book-Rating`          | Rating (0-10) yang diberikan oleh pengguna untuk buku tertentu.                                 |
+| `Publisher`            | Nama penerbit buku.                                                                             |
+| `Year-Of-Publication`  | Tahun publikasi buku.                                                                           |
+| `Location`             | Lokasi pengguna yang memberikan rating.                                                        |
+| `Age`                  | Umur pengguna. (Dihilangkan pada model setelah preprocessing karena banyak nilai kosong).       |
+
+### **4. Visualisasi dan Insight**
+
+#### **4.1 Top 10 Pengguna Paling Aktif**
+
+Grafik ini menunjukkan 10 pengguna yang paling sering memberikan rating.
+
+
+**Insight**:
+- Terdapat beberapa pengguna yang sangat aktif, memberikan ribuan rating, yang dapat menjadi acuan kuat untuk membangun model berbasis *collaborative filtering*.
+
+---
+
+**Insight**:
+- Beberapa buku seperti seri *Harry Potter* sering kali memiliki jumlah rating yang sangat tinggi, menunjukkan popularitasnya di kalangan pengguna.
+
+---
+
+### **5. Exploratory Data Analysis (EDA)**
+
+#### **5.1 Statistik Deskriptif**
+
+**Hasil**:
+- `Book-Rating`: Memiliki rata-rata sekitar 5,5, menunjukkan bahwa pengguna cenderung memberikan rating menengah.
+- `Year-Of-Publication`: Berkisar dari tahun 1800-an hingga 2000-an, dengan mayoritas buku diterbitkan setelah tahun 1980.
+
+#### **5.2 Missing Value Handling**
+- Kolom `Age` memiliki banyak nilai kosong dan akhirnya dihapus dalam proses *preprocessing*.
+- Nilai kosong pada kolom `Book-Author` dan `Publisher` dihapus untuk menjaga integritas data.
+
+#### **5.3 Data Sparsity**
+
+**Hasil**:
+- Dataset sangat jarang (*sparse*), dengan sebagian besar pengguna tidak memberikan rating pada sebagian besar buku. Hal ini menjadi tantangan untuk model *collaborative filtering*.
+
+---
+
+### **Kesimpulan**
+
+- Dataset memberikan informasi kaya tentang buku, pengguna, dan rating, yang sangat mendukung pengembangan sistem rekomendasi.
+- Visualisasi menunjukkan pola penting, seperti pengguna aktif dan buku populer, yang dapat dimanfaatkan untuk membangun model yang lebih efektif.
+- Tantangan utama adalah menangani data yang jarang (*sparse*) dan meminimalkan bias terhadap buku-buku populer. 
 
 ## Data Preparation
 Pada bagian ini Anda menerapkan dan menyebutkan teknik data preparation yang dilakukan. Teknik yang digunakan pada notebook dan laporan harus berurutan.
