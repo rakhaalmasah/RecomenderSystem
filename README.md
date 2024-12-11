@@ -98,7 +98,6 @@ Dataset yang digunakan dalam proyek ini merupakan dataset rekomendasi buku yang 
 ### **2. Sumber Data**
 
 - **Dataset Asli**: Dataset dapat diakses di [Kaggle Book Recommendation Dataset](https://www.kaggle.com/datasets/arashnic/book-recommendation-dataset).
-- **Dataset Siap Digunakan untuk Model Collaborative Filtering**: [Dataset Collaborative Filtering](https://drive.google.com/file/d/1ctcN847pFHwG1MOg8oVyLOXunt-4cV6Q/view?usp=sharing).
 
 ### **3. Uraian Variabel**
 
@@ -155,11 +154,138 @@ Grafik ini menunjukkan 10 pengguna yang paling sering memberikan rating.
 - Tantangan utama adalah menangani data yang jarang (*sparse*) dan meminimalkan bias terhadap buku-buku populer. 
 
 ## Data Preparation
-Pada bagian ini Anda menerapkan dan menyebutkan teknik data preparation yang dilakukan. Teknik yang digunakan pada notebook dan laporan harus berurutan.
 
-**Rubrik/Kriteria Tambahan (Opsional)**: 
-- Menjelaskan proses data preparation yang dilakukan
-- Menjelaskan alasan mengapa diperlukan tahapan data preparation tersebut.
+Tahapan ini menjelaskan langkah-langkah untuk mempersiapkan dataset sebelum digunakan dalam model *machine learning*. Data preparation bertujuan untuk memastikan data siap digunakan, bersih, dan dalam format yang sesuai dengan kebutuhan algoritma. Berikut adalah tahapan yang dilakukan:
+
+---
+
+### **1. Identifikasi Masalah Data**
+
+Dataset mentah yang digunakan mencakup tiga file: `Books.csv`, `Ratings.csv`, dan `Users.csv`. Masalah utama yang ditemukan pada dataset adalah:
+- **Missing Values**: Kolom seperti `Book-Author` dan `Image-URL-L` di `Books.csv` mengandung nilai kosong.
+- **Redundansi Kolom**: Kolom yang tidak relevan seperti `Image-URL-S`, `Image-URL-M`, dan `Image-URL-L` tidak diperlukan untuk membangun model.
+- **Outliers pada Umur Pengguna**: Kolom `Age` pada `Users.csv` mengandung nilai tidak realistis, seperti `0` dan nilai yang sangat besar.
+- **Duplikasi Data**: Beberapa baris mungkin redundan dan perlu dihapus.
+
+---
+
+### **2. Langkah-Langkah Data Preparation**
+
+#### **2.1. Penanganan Missing Values**
+- **Langkah:**
+  - Missing values dihapus menggunakan fungsi `dropna()` pada dataset `Books.csv`.
+- **Alasan:**
+  - Data yang hilang dapat menyebabkan kesalahan dalam model, terutama jika kolom seperti `Book-Author` yang penting untuk *content-based filtering* mengandung nilai kosong.
+
+#### **2.2. Penghapusan Kolom Tidak Relevan**
+- **Langkah:**
+  - Kolom `Image-URL-S`, `Image-URL-M`, dan `Image-URL-L` dihapus karena tidak relevan untuk rekomendasi buku.
+- **Alasan:**
+  - Kolom ini hanya menyimpan URL gambar sampul buku dan tidak berkontribusi pada analisis atau model.
+
+#### **2.3. Normalisasi Rating**
+- **Langkah:**
+  - Kolom `Book-Rating` dinormalisasi ke skala 0-1 dengan membagi nilai rating dengan 10.
+- **Alasan:**
+  - Normalisasi memudahkan model untuk belajar secara konsisten, terutama untuk algoritma seperti *collaborative filtering* yang mengasumsikan input numerik berada dalam skala yang seragam.
+
+#### **2.4. Encoding Data**
+- **Langkah:**
+  - Kolom `User-ID` dan `ISBN` dienkode menjadi indeks integer menggunakan `astype('category').cat.codes`.
+- **Alasan:**
+  - Algoritma seperti *collaborative filtering* membutuhkan representasi data dalam format numerik agar dapat diproses dengan cepat.
+
+#### **2.5. Penggabungan Dataset**
+- **Langkah:**
+  - Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` digabungkan menggunakan `merge()` pada kolom `ISBN` dan `User-ID`.
+- **Alasan:**
+  - Model rekomendasi membutuhkan informasi pengguna, buku, dan rating dalam satu dataset agar dapat digunakan secara efektif.
+
+#### **2.6. Pembuatan Metadata**
+- **Langkah:**
+  - Untuk *content-based filtering*, kolom `metadata` dibuat dengan menggabungkan `Book-Title`, `Book-Author`, dan `Publisher`.
+- **Alasan:**
+  - Metadata digunakan untuk merepresentasikan setiap buku sebagai teks yang dapat dianalisis menggunakan teknik seperti *TF-IDF vectorization*.
+
+---
+
+### **3. Penerapan Teknik Data Preparation**
+
+#### **Langkah-Langkah yang Dilakukan:**
+
+1. **Handling Missing Values**
+
+```python
+# Menghapus baris yang memiliki nilai NaN
+books_cleaned = books.dropna()
+users_cleaned = users.drop(columns=['Age'])  # Menghapus kolom Age dengan banyak nilai kosong
+```
+
+2. **Penghapusan Kolom Tidak Relevan**
+
+```python
+# Menghapus kolom yang tidak diperlukan
+books_cleaned = books_cleaned.drop(columns=['Image-URL-S', 'Image-URL-M', 'Image-URL-L'])
+```
+
+3. **Normalisasi Rating**
+
+```python
+# Normalisasi nilai rating
+data['Book-Rating'] = data['Book-Rating'] / 10.0
+```
+
+4. **Encoding Data**
+
+```python
+# Encoding User-ID dan ISBN menjadi indeks numerik
+data['user_idx'] = data['User-ID'].astype('category').cat.codes.values
+data['book_idx'] = data['ISBN'].astype('category').cat.codes.values
+```
+
+5. **Penggabungan Dataset**
+
+```python
+# Menggabungkan dataset
+ratings_books = ratings.merge(books_cleaned, on='ISBN', how='inner')
+ratings_books_users = ratings_books.merge(users_cleaned, on='User-ID', how='inner')
+```
+
+6. **Pembuatan Metadata**
+
+```python
+# Membuat metadata untuk content-based filtering
+data['metadata'] = data['Book-Title'] + ' ' + data['Book-Author'] + ' ' + data['Publisher']
+data['metadata'] = data['metadata'].fillna('')  # Handle NaN values
+```
+
+---
+
+### **4. Hasil Data Preparation**
+
+#### **Dataset Hasil Data Preparation**
+
+- Dataset setelah pembersihan terdiri dari:
+  - **1031128 baris**.
+  - **8 kolom**, yaitu `User-ID`, `ISBN`, `Book-Rating`, `Book-Title`, `Book-Author`, `Year-Of-Publication`, `Publisher`, dan `Location`.
+
+#### **Tautan Dataset yang Siap Digunakan**
+- Dataset setelah data preparation: [Google Drive](https://drive.google.com/file/d/1ctcN847pFHwG1MOg8oVyLOXunt-4cV6Q/view?usp=sharing)
+
+---
+
+### **5. Alasan Data Preparation Diperlukan**
+
+1. **Konsistensi Data**
+   - Data yang bersih dan lengkap memudahkan model untuk belajar dengan lebih baik.
+2. **Efisiensi Proses**
+   - Normalisasi dan encoding data membantu dalam mempercepat waktu komputasi.
+3. **Mengatasi *Cold Start Problem***
+   - Metadata yang dibuat memungkinkan rekomendasi untuk pengguna baru dengan data rating yang terbatas.
+4. **Meningkatkan Akurasi Model**
+   - Data yang relevan dan bebas dari noise meningkatkan performa model dalam memberikan rekomendasi.
+
+--
 
 ## Modeling
 Tahapan ini membahas mengenai model sisten rekomendasi yang Anda buat untuk menyelesaikan permasalahan. Sajikan top-N recommendation sebagai output.
