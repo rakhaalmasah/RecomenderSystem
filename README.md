@@ -1,5 +1,7 @@
 # Laporan Proyek Machine Learning - Muhammad Rakha Almasah
 
+---
+
 ## Project Overview
 
 Sistem rekomendasi buku adalah alat yang memanfaatkan algoritma untuk menyarankan buku kepada pengguna berdasarkan preferensi dan perilaku mereka. Dalam era digital saat ini, di mana informasi dan pilihan buku sangat melimpah, pembaca sering menghadapi kesulitan dalam menentukan buku apa yang akan dibaca selanjutnya. Hal ini dapat menyebabkan kebingungan dan keputusan yang kurang optimal dalam pemilihan buku.
@@ -53,6 +55,8 @@ Untuk mencapai tujuan tersebut, digunakan dua pendekatan utama dalam membangun s
 - **Solution 2: Collaborative Filtering**
 
   Pendekatan collaborative filtering bekerja dengan menganalisis pola interaksi pengguna, seperti rating atau ulasan, untuk memberikan rekomendasi. Sistem ini memanfaatkan kemiripan antara pengguna atau item untuk menghasilkan rekomendasi.
+
+---
 
 ## Data Understanding
 
@@ -152,6 +156,8 @@ Grafik ini menunjukkan 10 pengguna yang paling sering memberikan rating.
 - Dataset memberikan informasi kaya tentang buku, pengguna, dan rating, yang sangat mendukung pengembangan sistem rekomendasi.
 - Visualisasi menunjukkan pola penting, seperti pengguna aktif dan buku populer, yang dapat dimanfaatkan untuk membangun model yang lebih efektif.
 - Tantangan utama adalah menangani data yang jarang (*sparse*) dan meminimalkan bias terhadap buku-buku populer. 
+
+---
 
 ## Data Preparation
 
@@ -288,11 +294,100 @@ data['metadata'] = data['metadata'].fillna('')  # Handle NaN values
 ---
 
 ## Modeling
-Tahapan ini membahas mengenai model sisten rekomendasi yang Anda buat untuk menyelesaikan permasalahan. Sajikan top-N recommendation sebagai output.
 
-**Rubrik/Kriteria Tambahan (Opsional)**: 
-- Menyajikan dua solusi rekomendasi dengan algoritma yang berbeda.
-- Menjelaskan kelebihan dan kekurangan dari solusi/pendekatan yang dipilih.
+Pada bab ini, dua pendekatan utama digunakan untuk membangun sistem rekomendasi, yaitu *collaborative filtering* dan *content-based filtering*. Setiap pendekatan memiliki algoritma, hasil, serta kelebihan dan kekurangan yang akan dijelaskan secara terpisah.
+
+---
+
+### **1. Collaborative Filtering**
+
+#### **Penjelasan Algoritma**
+*Collaborative filtering* menggunakan data interaksi pengguna dan item (buku) untuk memberikan rekomendasi berdasarkan pola yang ditemukan dari data tersebut.
+
+1. **Input Data:**
+   - Dataset berisi informasi *user-item* (pengguna-buku) dan nilai rating yang diberikan pengguna.
+   - Data dienkode menjadi representasi numerik (`user_idx` dan `book_idx`) untuk diproses oleh model.
+
+2. **Arsitektur Model:**
+   - **Embedding Layer:** Representasi numerik pengguna dan buku diubah menjadi vektor berdimensi tinggi untuk menangkap hubungan laten antar entitas.
+   - **Fully Connected Layers:** Vektor embedding diproses melalui beberapa lapisan tersembunyi untuk menghasilkan prediksi rating.
+   - **Loss Function:** *Weighted Mean Squared Error (WMSE)* digunakan untuk memberikan bobot lebih pada rating yang lebih tinggi.
+   - **Optimizer:** *Adam optimizer* dipilih untuk mempercepat proses konvergensi.
+
+3. **Hasil Training:**
+   - Model dilatih selama 7 epoch sebelum mekanisme *early stopping* menghentikan pelatihan untuk menghindari overfitting.
+   - Grafik *training loss* dan *validation loss* menunjukkan performa model selama proses pelatihan.
+
+#### **Hasil Model**
+
+1. **Grafik Training dan Validation Loss**
+![Training and Validation Loss](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/training%20val%20loss.png)
+
+2. **Top-N Recommendation**
+   - Model menghasilkan rekomendasi buku untuk pengguna tertentu. Berikut adalah hasil rekomendasi untuk dua pengguna:
+     - **User-ID: 11676**
+       ![Recommendation for User-ID 11676](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/Rekomendasi_11676.png)
+     - **User-ID: 198711**
+       ![Recommendation for User-ID 198711](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/Rekomendasi_198711.png)
+
+#### **Kelebihan dan Kekurangan Collaborative Filtering**
+
+| **Kelebihan**                                     | **Kekurangan**                                                 |
+|---------------------------------------------------|----------------------------------------------------------------|
+| Memberikan rekomendasi yang dipersonalisasi.      | Membutuhkan data interaksi yang cukup besar.                  |
+| Menggunakan hubungan laten untuk mengungkap pola. | Rentan terhadap *cold start problem* untuk pengguna atau item baru. |
+| Cocok untuk dataset besar dengan banyak pengguna. | Membutuhkan waktu komputasi lebih lama untuk pelatihan model. |
+
+---
+
+### **2. Content-Based Filtering**
+
+#### **Penjelasan Algoritma**
+*Content-based filtering* memberikan rekomendasi berdasarkan kesamaan konten, seperti penulis buku atau atribut lain.
+
+1. **Input Data:**
+   - Metadata dari buku, seperti `Book-Title`, `Book-Author`, dan `Publisher`.
+   - Metadata ini digabungkan menjadi satu kolom bernama `metadata`.
+
+2. **Proses Algoritma:**
+   - **TF-IDF Vectorization:** Metadata buku diubah menjadi representasi numerik berdasarkan bobot kata unik.
+   - **Cosine Similarity:** Digunakan untuk menghitung kesamaan antar buku berdasarkan vektor TF-IDF.
+
+3. **Fungsi Rekomendasi:**
+   - Fungsi mencari buku dengan kesamaan tertinggi berdasarkan *cosine similarity* dan mengembalikan daftar buku yang mirip.
+
+#### **Hasil Model**
+
+1. **Top-N Recommendation**
+   - Hasil rekomendasi untuk dua judul buku:
+     - **Judul: "Harry Potter and the Order of the Phoenix"**
+       ![Content-Based Recommendation for Harry Potter](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/Content%20Hary%20Potter.png)
+     - **Judul: "Along Came a Spider (Alex Cross Novels)"**
+       ![Content-Based Recommendation for Along Came a Spider](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/A%20long%20came_content.png)
+
+#### **Kelebihan dan Kekurangan Content-Based Filtering**
+
+| **Kelebihan**                                     | **Kekurangan**                                                 |
+|---------------------------------------------------|----------------------------------------------------------------|
+| Tidak memerlukan data interaksi antar pengguna.   | Rentan terhadap masalah *overspecialization* (rekomendasi terlalu serupa). |
+| Cocok untuk pengguna baru dengan sedikit data.    | Tidak mempertimbangkan pola perilaku antar pengguna.          |
+| Mudah diimplementasikan dengan metadata buku.     | Membutuhkan metadata yang lengkap dan akurat.                |
+
+---
+
+### **Kesimpulan**
+
+1. **Collaborative Filtering**
+   - Cocok untuk menghasilkan rekomendasi personalisasi tinggi berdasarkan interaksi pengguna.
+   - Memiliki keterbatasan pada pengguna baru atau item dengan data interaksi minim (*cold start problem*).
+
+2. **Content-Based Filtering**
+   - Memberikan rekomendasi berdasarkan kemiripan konten, sehingga berguna untuk pengguna baru.
+   - Terbatas pada kesamaan atribut tanpa memperhitungkan perilaku atau preferensi pengguna lain.
+
+Pemilihan algoritma bergantung pada kebutuhan dan ketersediaan data. Kombinasi kedua metode (hybrid approach) dapat digunakan untuk memaksimalkan performa sistem rekomendasi.
+
+---
 
 ## Evaluation
 Pada bagian ini Anda perlu menyebutkan metrik evaluasi yang digunakan. Kemudian, jelaskan hasil proyek berdasarkan metrik evaluasi tersebut.
