@@ -421,16 +421,6 @@ $$
 **Interpretasi:**
 - **Training Loss** dan **Validation Loss** menunjukkan bahwa model dapat mempelajari data tanpa overfitting.
 - Nilai Weighted MSE yang rendah menunjukkan prediksi model mendekati nilai aktual, terutama untuk rating non-nol.
-
-#### **Hasil Rekomendasi Collaborative Filtering**
-Rekomendasi diberikan berdasarkan pola interaksi pengguna dan buku. Berikut adalah contoh hasil rekomendasi untuk pengguna tertentu:
-
-- **Pengguna ID 11676**
-  ![Rekomendasi untuk 11676](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/Rekomendasi_11676.png)
-
-- **Pengguna ID 198711**
-  ![Rekomendasi untuk 198711](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/Rekomendasi_198711.png)
-
 ---
 
 ### **2. Evaluasi Content-Based Filtering**
@@ -450,10 +440,6 @@ Hasil rekomendasi:
 | Harry Potter y el cáliz de fuego                    | J. K. Rowling    |
 | Harry Potter et la chambre des secrets              | J. K. Rowling    |
 | Harry Potter a l'ecole des sorciers                 | J. K. Rowling    |
-
-#### **Visualisasi Hasil**
-- **Rekomendasi Berdasarkan Buku Input:**
-  ![Content-Based Harry Potter](https://raw.githubusercontent.com/rakhaalmasah/RecomenderSystem/e53ad572ad130d9bb053926a12fe8d0eb1638b41/Content%20Hary%20Potter.png)
 
 ---
 
