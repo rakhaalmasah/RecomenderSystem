@@ -458,3 +458,82 @@ Hasil rekomendasi:
 1. **Collaborative Filtering** menghasilkan rekomendasi yang sangat personal tetapi memerlukan data interaksi yang memadai.
 2. **Content-Based Filtering** memberikan rekomendasi berdasarkan atribut konten, cocok untuk pengguna baru atau item baru.
 3. Kombinasi kedua pendekatan dalam *hybrid recommendation system* dapat mengatasi kekurangan masing-masing metode untuk hasil yang lebih optimal.
+
+---
+
+## **Penutup**
+
+Bab ini membahas dampak model yang telah dievaluasi terhadap *business understanding* berdasarkan analisis evaluasi. Selain itu, kesimpulan juga mencakup apakah pendekatan yang digunakan berhasil menjawab *problem statement*, mencapai *goals*, dan memberikan dampak positif sesuai dengan *solution statement* yang direncanakan.
+
+---
+
+### **1. Apakah Sudah Menjawab Problem Statement?**
+
+**Problem Statement:**
+- Bagaimana memberikan rekomendasi buku yang relevan bagi pengguna dengan memanfaatkan data rating dan metadata buku?
+
+**Analisis:**
+- **Collaborative Filtering:** Model ini menjawab *problem statement* dengan memberikan rekomendasi berdasarkan pola rating pengguna lain yang serupa. Hal ini memungkinkan sistem memberikan rekomendasi yang sangat personal.
+  - Contoh hasil rekomendasi untuk pengguna ID tertentu menunjukkan bahwa model dapat mengidentifikasi buku yang sesuai dengan preferensi pengguna tersebut, berdasarkan interaksi historis.
+- **Content-Based Filtering:** Model ini menjawab *problem statement* dengan merekomendasikan buku berdasarkan atribut konten (penulis). Hal ini memastikan bahwa rekomendasi relevan dengan karakteristik buku input.
+  - Contoh hasil rekomendasi berdasarkan buku *"Harry Potter a l'ecole des sorciers"* menunjukkan bahwa sistem mampu menemukan buku dari penulis yang sama.
+
+**Kesimpulan:**
+- Kedua pendekatan telah menjawab *problem statement* dengan cara yang berbeda namun saling melengkapi.
+
+---
+
+### **2. Apakah Berhasil Mencapai Goals yang Diharapkan?**
+
+**Goals:**
+1. Memberikan rekomendasi buku yang relevan berdasarkan preferensi pengguna.
+2. Meningkatkan pengalaman pengguna dalam menemukan buku yang sesuai dengan minatnya.
+
+**Evaluasi Pencapaian Goals:**
+- **Collaborative Filtering:**
+  - Model berhasil memberikan rekomendasi yang relevan dengan preferensi pengguna, dengan nilai *validation loss* yang rendah (0.0010), menunjukkan akurasi prediksi yang baik.
+  - Rekomendasi yang dihasilkan personal dan dapat membantu pengguna menemukan buku sesuai preferensinya.
+- **Content-Based Filtering:**
+  - Model memberikan rekomendasi yang sesuai dengan atribut konten buku (penulis), seperti rekomendasi buku karya *J. K. Rowling* untuk buku *Harry Potter*.
+  - Pendekatan ini mendukung pengguna yang baru bergabung atau belum memberikan banyak data interaksi (*cold start problem*).
+
+**Kesimpulan:**
+- Kedua pendekatan berhasil mencapai *goals* yang direncanakan. Model membantu pengguna menemukan buku yang relevan dan meningkatkan pengalaman pencarian buku.
+
+---
+
+### **3. Apakah Solusi Statement Berdampak?**
+
+**Solusi Statement:**
+Menggunakan dua pendekatan (*collaborative filtering* dan *content-based filtering*) untuk memberikan rekomendasi buku yang relevan.
+
+**Dampak Solusi Statement:**
+- **Collaborative Filtering:**
+  - **Dampak Positif:**
+    - Model memberikan rekomendasi personal dengan memanfaatkan data interaksi historis pengguna.
+    - Cocok untuk pengguna dengan riwayat interaksi yang cukup, meningkatkan loyalitas pengguna dengan rekomendasi yang akurat.
+  - **Keterbatasan:**
+    - Tidak mampu memberikan rekomendasi untuk item baru (*cold start problem*).
+- **Content-Based Filtering:**
+  - **Dampak Positif:**
+    - Model dapat memberikan rekomendasi yang relevan tanpa memerlukan data pengguna lain, cocok untuk pengguna baru.
+    - Menyediakan rekomendasi berdasarkan kesamaan atribut konten, membantu pengguna menemukan buku lain dari penulis favorit.
+  - **Keterbatasan:**
+    - Rentan terhadap masalah *overspecialization* (rekomendasi hanya dari penulis atau genre yang sama).
+    - Tidak memperhitungkan preferensi pengguna lain, sehingga rekomendasi kurang personal.
+
+**Kesimpulan:**
+- Kombinasi kedua pendekatan ini memberikan solusi yang komprehensif:
+  - **Collaborative filtering** memberikan rekomendasi personal untuk pengguna yang memiliki data interaksi yang cukup.
+  - **Content-based filtering** melengkapi dengan memberikan rekomendasi berbasis konten untuk pengguna baru atau item baru.
+- Pendekatan ini berdampak positif terhadap pengalaman pengguna dan relevansi rekomendasi, yang secara langsung mendukung *business goals*.
+
+---
+
+### **Kesimpulan Utama**
+- **Problem Statement Terjawab:** Kedua pendekatan memberikan rekomendasi yang relevan dengan cara yang berbeda, sehingga menjawab kebutuhan sistem rekomendasi yang relevan.
+- **Goals Tercapai:** Model telah memberikan hasil yang memenuhi tujuan proyek, yaitu rekomendasi yang relevan dan meningkatkan pengalaman pengguna.
+- **Dampak Solusi:** Kombinasi kedua pendekatan memberikan dampak positif terhadap relevansi rekomendasi, dengan memanfaatkan kekuatan masing-masing metode untuk mengatasi keterbatasan.
+
+### **Saran Pengembangan**
+Untuk hasil yang lebih optimal, pendekatan *hybrid recommendation system* dapat diterapkan untuk menggabungkan kekuatan kedua metode, sehingga memberikan rekomendasi yang personal sekaligus relevan berdasarkan konten.
