@@ -257,74 +257,83 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 ### **3. Tahapan Data Preparation untuk Content-Based Filtering**
 
-#### **3.1. Handling Missing Values**
+#### **3.1. Penggabungan Dataset**
 
-- **Langkah:**  
-  Missing values pada kolom `Book-Author` dihapus menggunakan `dropna()`.
-  
+- **Langkah:**
+  - Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` digabungkan menggunakan kolom `ISBN` dan `User-ID` untuk mendapatkan data lengkap tentang buku, penulis, dan interaksi pengguna.
+- **Alasan:**
+  - Untuk *content-based filtering*, diperlukan informasi buku seperti `Book-Title` dan `Book-Author` yang digabungkan dengan data interaksi rating dari pengguna.
+
 ```python
-books_cleaned = books.dropna(subset=['Book-Author'])
+merged_books = books_df[['ISBN', 'Book-Title', 'Book-Author']].merge(ratings_df, on='ISBN')
+merged_books = merged_books.merge(users_df, on='User-ID')
 ```
 
-- **Alasan:**  
-  Kolom `Book-Author` sangat penting untuk membangun fitur berbasis konten.
+#### **3.2. Handling Missing Values**
 
-#### **3.2. Penghapusan Kolom Tidak Relevan**
+- **Langkah:**
+  - Missing values pada kolom `Book-Author` dihapus menggunakan `dropna()`.
+- **Alasan:**
+  - Kolom `Book-Author` sangat penting karena menjadi dasar untuk menghitung kemiripan antar buku. Data yang hilang pada kolom ini akan mengurangi kualitas rekomendasi.
 
-- **Langkah:**  
-  Kolom seperti `Image-URL-S`, `Image-URL-M`, dan `Image-URL-L` dihapus.
-  
 ```python
-books_cleaned = books_cleaned.drop(columns=['Image-URL-S', 'Image-URL-M', 'Image-URL-L'])
+merged_books = merged_books.dropna()
 ```
 
-- **Alasan:**  
-  Kolom ini tidak memiliki kontribusi langsung pada pembuatan fitur berbasis konten.
+#### **3.3. Penghapusan Duplikasi**
 
-#### **3.3. Pembuatan Metadata**
+- **Langkah:**
+  - Dataset diperiksa untuk memastikan tidak ada data duplikat menggunakan fungsi `duplicated()`.
+- **Alasan:**
+  - Duplikasi data dapat menyebabkan bias dalam perhitungan kemiripan atau evaluasi model.
 
-- **Langkah:**  
-  Metadata dibuat dengan menggabungkan `Book-Title`, `Book-Author`, dan `Publisher`.
-  
 ```python
-books_cleaned['metadata'] = books_cleaned['Book-Title'] + ' ' + books_cleaned['Book-Author'] + ' ' + books_cleaned['Publisher']
+print("Jumlah duplikasi: ", merged_books.duplicated().sum())
 ```
 
-- **Alasan:**  
-  Metadata digunakan untuk merepresentasikan buku sebagai teks untuk analisis lebih lanjut.
+#### **3.4. Penyederhanaan Dataset**
 
-#### **3.4. Ekstraksi Fitur dengan TF-IDF**
+- **Langkah:**
+  - Dataset disederhanakan dengan hanya menyimpan kolom `Book-Title` dan `Book-Author`.
+- **Alasan:**
+  - Fokus dari *content-based filtering* adalah pada konten buku, sehingga hanya atribut ini yang relevan.
 
-- **Langkah:**  
-  *TF-IDF Vectorizer* digunakan untuk mengubah metadata menjadi representasi vektor.
-  
+```python
+content_data = merged_books[['Book-Title', 'Book-Author']].drop_duplicates()
+```
+
+#### **3.5. Ekstraksi Fitur dengan TF-IDF**
+
+- **Langkah:**
+  - *TF-IDF Vectorizer* diterapkan pada kolom `Book-Author` untuk merepresentasikan penulis dalam bentuk vektor.
+- **Alasan:**
+  - TF-IDF menghitung bobot kata untuk mengidentifikasi istilah unik dalam nama penulis, yang membantu model dalam mengukur kemiripan antar buku.
+
 ```python
 tfidf = TfidfVectorizer(stop_words='english')
-tfidf_matrix = tfidf.fit_transform(books_cleaned['metadata'])
+tfidf_matrix = tfidf.fit_transform(content_data['Book-Author'])
 ```
 
-- **Alasan:**  
-  Representasi vektor ini memungkinkan perhitungan kemiripan antar buku.
+#### **3.6. Perhitungan Cosine Similarity**
 
-#### **3.5. Perhitungan Cosine Similarity**
+- **Langkah:**
+  - Matriks *cosine similarity* dihitung dari matriks TF-IDF.
+- **Alasan:**
+  - Cosine similarity digunakan untuk menentukan kemiripan antar buku berdasarkan representasi vektor dari nama penulis.
 
-- **Langkah:**  
-  Matriks *cosine similarity* dihitung dari matriks TF-IDF.
-  
 ```python
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 ```
 
-- **Alasan:**  
-  Matriks ini digunakan untuk menemukan buku yang mirip berdasarkan konten.
+---
 
-#### **Dataset Akhir untuk Content-Based Filtering**
+### **Dataset Akhir untuk Content-Based Filtering**
 
-| **Kolom Utama** | **Deskripsi**                              |
-|-----------------|-------------------------------------------|
-| `metadata`      | Kombinasi atribut buku (`Book-Title`, `Book-Author`, `Publisher`) |
-| `Book-Title`    | Nama buku sebagai identifikasi            |
-
+- Kolom yang digunakan:
+  - **`Book-Title`**: Nama buku untuk identifikasi.
+  - **`Book-Author`**: Nama penulis sebagai atribut utama.
+- Total data:
+  - **Buku unik:** 212,544 buku.
 ---
 
 ### **4. Perbandingan Dataset**
