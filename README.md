@@ -255,62 +255,113 @@ ratings_books_users.to_csv("Ratings_Books_Users_Cleaned.csv", index=False)
 - **Hasil**:
   File dataset disimpan dengan nama **`Ratings_Books_Users_Cleaned.csv`**.
 
+#### **2.5. Encode Label**
+
+- **Langkah:**  
+  Kolom `User-ID` dan `ISBN` dienkode menjadi indeks numerik menggunakan `.astype('category').cat.codes`.
+  
+```python
+data['user_idx'] = data['User-ID'].astype('category').cat.codes.values
+data['book_idx'] = data['ISBN'].astype('category').cat.codes.values
+```
+
+- **Alasan:**  
+  Representasi numerik diperlukan agar algoritma dapat memproses data lebih cepat.
+
+#### **2.6. Normalisasi Rating**
+
+- **Langkah:**  
+  Kolom `Book-Rating` dinormalisasi ke skala 0-1 untuk menyamakan skala nilai.
+  
+```python
+data['Book-Rating'] = data['Book-Rating'] / 10.0
+```
+
+- **Alasan:**  
+  Normalisasi membantu algoritma memahami data dalam rentang yang konsisten.
+
+#### **2.7. Split Data**
+
+- **Langkah:**  
+  Dataset dipecah menjadi *training set* dan *test set* menggunakan fungsi `train_test_split`.
+  
+```python
+X = data[['user_idx', 'book_idx']]
+y = data['Book-Rating']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+```
+
+- **Alasan:**  
+  Pemisahan ini diperlukan untuk mengevaluasi performa model dengan data baru yang tidak terlihat selama pelatihan.
+  
 ---
 
 ### **3. Tahapan Data Preparation untuk Content-Based Filtering**
 
-#### **3.1. Menggabungkan Dataset**
+#### **3.1. Penggabungan Dataset**
 
-- **Langkah**:
-  - Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` digabungkan menggunakan kolom `ISBN` dan `User-ID`.
+- **Langkah:**
+  - Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` digabungkan menggunakan kolom `ISBN` dan `User-ID` untuk mendapatkan data lengkap tentang buku, penulis, dan interaksi pengguna.
+- **Alasan:**
+  - Untuk *content-based filtering*, diperlukan informasi buku seperti `Book-Title` dan `Book-Author` yang digabungkan dengan data interaksi rating dari pengguna.
 
 ```python
 merged_books = books_df[['ISBN', 'Book-Title', 'Book-Author']].merge(ratings_df, on='ISBN')
 merged_books = merged_books.merge(users_df, on='User-ID')
 ```
 
----
+#### **3.2. Handling Missing Values**
 
-#### **3.2. Mengatasi Missing Values**
-
-- **Langkah**:
-  - Baris yang memiliki nilai kosong dihapus menggunakan fungsi `dropna()`.
+- **Langkah:**
+  - Missing values pada kolom `Book-Author` dihapus menggunakan `dropna()`.
+- **Alasan:**
+  - Kolom `Book-Author` sangat penting karena menjadi dasar untuk menghitung kemiripan antar buku. Data yang hilang pada kolom ini akan mengurangi kualitas rekomendasi.
 
 ```python
 merged_books = merged_books.dropna()
 ```
 
-- **Hasil**:
-  Dataset menjadi bersih dan memiliki **753,299 baris**.
+#### **3.3. Penghapusan Duplikasi**
 
----
+- **Langkah:**
+  - Dataset diperiksa untuk memastikan tidak ada data duplikat menggunakan fungsi `duplicated()`.
+- **Alasan:**
+  - Duplikasi data dapat menyebabkan bias dalam perhitungan kemiripan atau evaluasi model.
 
-#### **3.3. Penyederhanaan Dataset**
+```python
+print("Jumlah duplikasi: ", merged_books.duplicated().sum())
+```
 
-- **Langkah**:
-  - Kolom yang relevan untuk *content-based filtering* disederhanakan menjadi `Book-Title` dan `Book-Author`.
-  - Duplikasi dihapus menggunakan `drop_duplicates()`.
+#### **3.4. Penyederhanaan Dataset**
+
+- **Langkah:**
+  - Dataset disederhanakan dengan hanya menyimpan kolom `Book-Title` dan `Book-Author`.
+- **Alasan:**
+  - Fokus dari *content-based filtering* adalah pada konten buku, sehingga hanya atribut ini yang relevan.
 
 ```python
 content_data = merged_books[['Book-Title', 'Book-Author']].drop_duplicates()
 ```
 
-- **Hasil**:
-  Dataset memiliki **271,353 buku unik**.
+#### **3.5. Ekstraksi Fitur dengan TF-IDF**
 
----
-
-#### **3.4. Pembuatan Metadata**
-
-- **Langkah**:
-  - Metadata dibuat dengan menggabungkan `Book-Title` dan `Book-Author`.
+- **Langkah:**
+  - *TF-IDF Vectorizer* diterapkan pada kolom `Book-Author` untuk merepresentasikan penulis dalam bentuk vektor.
+- **Alasan:**
+  - TF-IDF menghitung bobot kata untuk mengidentifikasi istilah unik dalam nama penulis, yang membantu model dalam mengukur kemiripan antar buku.
 
 ```python
-content_data['metadata'] = content_data['Book-Title'] + ' ' + content_data['Book-Author']
+tfidf = TfidfVectorizer(stop_words='english')
+tfidf_matrix = tfidf.fit_transform(content_data['Book-Author'])
 ```
 
-- **Hasil**:
-  Metadata ini digunakan sebagai fitur utama untuk menghitung kemiripan konten buku.
+### **Dataset Akhir untuk Content-Based Filtering**
+
+- Kolom yang digunakan:
+  - **`Book-Title`**: Nama buku untuk identifikasi.
+  - **`Book-Author`**: Nama penulis sebagai atribut utama.
+- Total data:
+  - **Buku unik:** 212,544 buku.
 
 ---
 
