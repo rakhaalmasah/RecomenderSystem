@@ -160,203 +160,185 @@ Grafik ini menunjukkan 10 pengguna yang paling sering memberikan rating.
 
 ## **Data Preparation**
 
-Tahapan ini menjelaskan langkah-langkah untuk mempersiapkan dataset sebelum digunakan dalam model *machine learning*. Data preparation bertujuan untuk memastikan data bersih, relevan, dan sesuai dengan kebutuhan masing-masing algoritma yang digunakan, yaitu *Collaborative Filtering* dan *Content-Based Filtering*. Karena kebutuhan kedua metode berbeda, dataset akhir yang digunakan juga berbeda.
+Tahapan ini menjelaskan langkah-langkah untuk mempersiapkan dataset sebelum digunakan dalam dua metode model rekomendasi: *Collaborative Filtering* dan *Content-Based Filtering*. Data preparation bertujuan untuk membersihkan, mengorganisir, dan menyiapkan dataset agar siap digunakan pada tahap pemodelan.
 
 ---
 
 ### **1. Identifikasi Masalah Data**
 
-Dataset mentah yang digunakan mencakup tiga file utama: `Books.csv`, `Ratings.csv`, dan `Users.csv`. Berikut adalah masalah utama yang ditemukan:
+Dataset yang digunakan berasal dari tiga file utama: 
+- **Books.csv**: Informasi detail tentang buku.
+- **Ratings.csv**: Informasi rating yang diberikan oleh pengguna ke buku.
+- **Users.csv**: Informasi detail pengguna.
 
-1. **Missing Values**  
-   - Kolom seperti `Book-Author` dan `Image-URL-L` di `Books.csv` mengandung nilai kosong.
-2. **Redundansi Kolom**  
-   - Kolom seperti `Image-URL-S`, `Image-URL-M`, dan `Image-URL-L` tidak relevan untuk pembuatan model rekomendasi.
-3. **Format Data**  
-   - Kolom seperti `User-ID` dan `ISBN` perlu dienkode menjadi numerik untuk kebutuhan *collaborative filtering*.
-4. **Outliers**  
-   - Kolom `Age` di `Users.csv` mengandung nilai yang tidak realistis seperti `0` dan angka yang sangat besar.
+**Masalah Utama**:
+1. **Missing Values**:
+   - `Book-Author` dan `Publisher` di `Books.csv` mengandung nilai kosong.
+   - Kolom `Age` di `Users.csv` memiliki banyak nilai kosong.
+2. **Kolom Tidak Relevan**:
+   - Kolom seperti `Image-URL-S`, `Image-URL-M`, dan `Image-URL-L` tidak diperlukan.
+3. **Duplikasi Data**:
+   - Perlu memastikan tidak ada data duplikat.
+4. **Format Data**:
+   - Kolom `User-ID` dan `ISBN` perlu dienkode untuk *Collaborative Filtering*.
+5. **Penyatuan Data**:
+   - Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` harus digabungkan.
 
 ---
 
 ### **2. Tahapan Data Preparation untuk Collaborative Filtering**
 
-#### **2.1. Penggabungan Dataset**
+#### **2.1. Memeriksa dan Membersihkan Dataset Books**
 
-- **Langkah:**  
-  Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` digabungkan menggunakan kolom `ISBN` dan `User-ID`. Hal ini memungkinkan penggabungan informasi pengguna, buku, dan rating dalam satu dataset.
-  
+- **Langkah**:
+  - Menghapus baris yang memiliki nilai kosong di kolom penting seperti `Book-Author` dan `Publisher`.
+  - Menghapus kolom `Image-URL-S`, `Image-URL-M`, dan `Image-URL-L` karena tidak relevan.
+
+```python
+books_cleaned = books.dropna()
+books_cleaned = books_cleaned.drop(columns=['Image-URL-S', 'Image-URL-M', 'Image-URL-L'])
+```
+
+- **Hasil**:
+  Dataset `Books` memiliki **271,353 baris** dengan 5 kolom utama setelah dibersihkan.
+
+---
+
+#### **2.2. Membersihkan Dataset Users**
+
+- **Langkah**:
+  - Kolom `Age` dihapus karena mengandung banyak nilai kosong (110,762 nilai kosong).
+
+```python
+users_cleaned = users.drop(columns=['Age'])
+```
+
+- **Hasil**:
+  Dataset `Users` memiliki **2 kolom** (`User-ID` dan `Location`).
+
+---
+
+#### **2.3. Menggabungkan Dataset**
+
+- **Langkah**:
+  - Dataset `Ratings` digabungkan dengan `Books` berdasarkan kolom `ISBN`.
+  - Hasil penggabungan kemudian digabungkan dengan `Users` berdasarkan kolom `User-ID`.
+
 ```python
 ratings_books = ratings.merge(books_cleaned, on='ISBN', how='inner')
 ratings_books_users = ratings_books.merge(users_cleaned, on='User-ID', how='inner')
 ```
 
-- **Alasan:**  
-  Untuk *collaborative filtering*, diperlukan data interaksi pengguna dan buku berupa rating.
+- **Hasil**:
+  Dataset gabungan memiliki **1,031,128 entri** dan 8 kolom utama.
 
-#### **2.2. Handling Missing Values**
+| **Kolom Utama**           | **Deskripsi**                      |
+|---------------------------|-----------------------------------|
+| `User-ID`                 | ID pengguna                       |
+| `ISBN`                    | ID buku                           |
+| `Book-Rating`             | Rating yang diberikan pengguna    |
+| `Book-Title`, `Book-Author` | Informasi buku                   |
+| `Year-Of-Publication`     | Tahun publikasi buku              |
+| `Publisher`               | Penerbit buku                     |
+| `Location`                | Lokasi pengguna                   |
 
-- **Langkah:**  
-  Baris yang memiliki nilai kosong dihapus menggunakan fungsi `dropna()`.
-  
+---
+
+#### **2.4. Menyimpan Dataset untuk Collaborative Filtering**
+
+Dataset yang sudah dibersihkan dan digabungkan disimpan dalam format CSV untuk digunakan dalam pemodelan.
+
 ```python
-ratings_books_users = ratings_books_users.dropna()
+ratings_books_users.to_csv("Ratings_Books_Users_Cleaned.csv", index=False)
 ```
 
-- **Alasan:**  
-  Data kosong dapat menyebabkan kesalahan selama pelatihan model.
-
-#### **2.3. Encode Label**
-
-- **Langkah:**  
-  Kolom `User-ID` dan `ISBN` dienkode menjadi indeks numerik menggunakan `.astype('category').cat.codes`.
-  
-```python
-data['user_idx'] = data['User-ID'].astype('category').cat.codes.values
-data['book_idx'] = data['ISBN'].astype('category').cat.codes.values
-```
-
-- **Alasan:**  
-  Representasi numerik diperlukan agar algoritma dapat memproses data lebih cepat.
-
-#### **2.4. Normalisasi Rating**
-
-- **Langkah:**  
-  Kolom `Book-Rating` dinormalisasi ke skala 0-1 untuk menyamakan skala nilai.
-  
-```python
-data['Book-Rating'] = data['Book-Rating'] / 10.0
-```
-
-- **Alasan:**  
-  Normalisasi membantu algoritma memahami data dalam rentang yang konsisten.
-
-#### **2.5. Split Data**
-
-- **Langkah:**  
-  Dataset dipecah menjadi *training set* dan *test set* menggunakan fungsi `train_test_split`.
-  
-```python
-X = data[['user_idx', 'book_idx']]
-y = data['Book-Rating']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-```
-
-- **Alasan:**  
-  Pemisahan ini diperlukan untuk mengevaluasi performa model dengan data baru yang tidak terlihat selama pelatihan.
-
-#### **Dataset Akhir untuk Collaborative Filtering**
-
-| **Kolom Utama** | **Deskripsi**                      |
-|-----------------|-----------------------------------|
-| `user_idx`      | Indeks numerik pengguna           |
-| `book_idx`      | Indeks numerik buku               |
-| `Book-Rating`   | Rating buku yang telah dinormalisasi |
+- **Hasil**:
+  File dataset disimpan dengan nama **`Ratings_Books_Users_Cleaned.csv`**.
 
 ---
 
 ### **3. Tahapan Data Preparation untuk Content-Based Filtering**
 
-#### **3.1. Penggabungan Dataset**
+#### **3.1. Menggabungkan Dataset**
 
-- **Langkah:**
-  - Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` digabungkan menggunakan kolom `ISBN` dan `User-ID` untuk mendapatkan data lengkap tentang buku, penulis, dan interaksi pengguna.
-- **Alasan:**
-  - Untuk *content-based filtering*, diperlukan informasi buku seperti `Book-Title` dan `Book-Author` yang digabungkan dengan data interaksi rating dari pengguna.
+- **Langkah**:
+  - Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` digabungkan menggunakan kolom `ISBN` dan `User-ID`.
 
 ```python
 merged_books = books_df[['ISBN', 'Book-Title', 'Book-Author']].merge(ratings_df, on='ISBN')
 merged_books = merged_books.merge(users_df, on='User-ID')
 ```
 
-#### **3.2. Handling Missing Values**
+---
 
-- **Langkah:**
-  - Missing values pada kolom `Book-Author` dihapus menggunakan `dropna()`.
-- **Alasan:**
-  - Kolom `Book-Author` sangat penting karena menjadi dasar untuk menghitung kemiripan antar buku. Data yang hilang pada kolom ini akan mengurangi kualitas rekomendasi.
+#### **3.2. Mengatasi Missing Values**
+
+- **Langkah**:
+  - Baris yang memiliki nilai kosong dihapus menggunakan fungsi `dropna()`.
 
 ```python
 merged_books = merged_books.dropna()
 ```
 
-#### **3.3. Penghapusan Duplikasi**
+- **Hasil**:
+  Dataset menjadi bersih dan memiliki **753,299 baris**.
 
-- **Langkah:**
-  - Dataset diperiksa untuk memastikan tidak ada data duplikat menggunakan fungsi `duplicated()`.
-- **Alasan:**
-  - Duplikasi data dapat menyebabkan bias dalam perhitungan kemiripan atau evaluasi model.
+---
 
-```python
-print("Jumlah duplikasi: ", merged_books.duplicated().sum())
-```
+#### **3.3. Penyederhanaan Dataset**
 
-#### **3.4. Penyederhanaan Dataset**
-
-- **Langkah:**
-  - Dataset disederhanakan dengan hanya menyimpan kolom `Book-Title` dan `Book-Author`.
-- **Alasan:**
-  - Fokus dari *content-based filtering* adalah pada konten buku, sehingga hanya atribut ini yang relevan.
+- **Langkah**:
+  - Kolom yang relevan untuk *content-based filtering* disederhanakan menjadi `Book-Title` dan `Book-Author`.
+  - Duplikasi dihapus menggunakan `drop_duplicates()`.
 
 ```python
 content_data = merged_books[['Book-Title', 'Book-Author']].drop_duplicates()
 ```
 
-#### **3.5. Ekstraksi Fitur dengan TF-IDF**
-
-- **Langkah:**
-  - *TF-IDF Vectorizer* diterapkan pada kolom `Book-Author` untuk merepresentasikan penulis dalam bentuk vektor.
-- **Alasan:**
-  - TF-IDF menghitung bobot kata untuk mengidentifikasi istilah unik dalam nama penulis, yang membantu model dalam mengukur kemiripan antar buku.
-
-```python
-tfidf = TfidfVectorizer(stop_words='english')
-tfidf_matrix = tfidf.fit_transform(content_data['Book-Author'])
-```
-
-#### **3.6. Perhitungan Cosine Similarity**
-
-- **Langkah:**
-  - Matriks *cosine similarity* dihitung dari matriks TF-IDF.
-- **Alasan:**
-  - Cosine similarity digunakan untuk menentukan kemiripan antar buku berdasarkan representasi vektor dari nama penulis.
-
-```python
-cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
-```
+- **Hasil**:
+  Dataset memiliki **271,353 buku unik**.
 
 ---
 
-### **Dataset Akhir untuk Content-Based Filtering**
+#### **3.4. Pembuatan Metadata**
 
-- Kolom yang digunakan:
-  - **`Book-Title`**: Nama buku untuk identifikasi.
-  - **`Book-Author`**: Nama penulis sebagai atribut utama.
-- Total data:
-  - **Buku unik:** 212,544 buku.
+- **Langkah**:
+  - Metadata dibuat dengan menggabungkan `Book-Title` dan `Book-Author`.
+
+```python
+content_data['metadata'] = content_data['Book-Title'] + ' ' + content_data['Book-Author']
+```
+
+- **Hasil**:
+  Metadata ini digunakan sebagai fitur utama untuk menghitung kemiripan konten buku.
+
 ---
 
 ### **4. Perbandingan Dataset**
 
 | **Aspek**                  | **Collaborative Filtering**                | **Content-Based Filtering**             |
 |----------------------------|-------------------------------------------|-----------------------------------------|
-| **Kolom Utama**            | `user_idx`, `book_idx`, `Book-Rating`     | `metadata`, `Book-Title`               |
-| **Format Rating**           | Dinormalisasi ke skala 0-1               | Tidak digunakan                        |
-| **Representasi Buku**       | Berdasarkan interaksi pengguna           | Berdasarkan atribut konten (`metadata`) |
+| **Kolom Utama**            | `User-ID`, `ISBN`, `Book-Rating`          | `Book-Title`, `Book-Author`, `metadata` |
 | **Jumlah Data Akhir**       | 1,031,128 baris                          | 271,353 buku unik                      |
+| **Kegunaan Data**           | Pola interaksi pengguna dan buku          | Kesamaan konten buku berdasarkan penulis|
 
 ---
 
 ### **5. Alasan Data Preparation Diperlukan**
 
-1. **Konsistensi Data:**  
-   Memastikan data bersih dan dalam format yang sesuai untuk digunakan model.
-2. **Efisiensi Komputasi:**  
-   Menghapus kolom tidak relevan mempercepat pemrosesan.
-3. **Kebutuhan Model:**  
-   Membuat metadata untuk *content-based filtering* dan encoding numerik untuk *collaborative filtering*.
+1. **Konsistensi Data**:  
+   Data yang bersih dan bebas nilai kosong memudahkan pemodelan.
+2. **Efisiensi Analisis**:  
+   Menghapus kolom tidak relevan mengurangi ukuran data dan mempercepat komputasi.
+3. **Pemenuhan Kebutuhan Algoritma**:  
+   - *Collaborative Filtering* memerlukan data interaksi pengguna-buku.
+   - *Content-Based Filtering* memerlukan metadata buku.
+4. **Hasil yang Lebih Akurat**:  
+   Data yang sudah diproses dengan baik memungkinkan model memberikan rekomendasi yang lebih relevan.
 
 ---
+
+Dengan tahapan ini, kedua dataset yang disiapkan telah memenuhi kebutuhan masing-masing metode rekomendasi dan siap digunakan untuk proses pemodelan.
 
 ## Modeling
 
