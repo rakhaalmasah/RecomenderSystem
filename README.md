@@ -293,6 +293,14 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 - **Alasan:**  
   Pemisahan ini diperlukan untuk mengevaluasi performa model dengan data baru yang tidak terlihat selama pelatihan.
+
+#### **Dataset Akhir untuk Collaborative Filtering**
+
+| **Kolom Utama** | **Deskripsi**                      |
+|-----------------|-----------------------------------|
+| `user_idx`      | Indeks numerik pengguna           |
+| `book_idx`      | Indeks numerik buku               |
+| `Book-Rating`   | Rating buku yang telah dinormalisasi |
   
 ---
 
@@ -369,9 +377,11 @@ tfidf_matrix = tfidf.fit_transform(content_data['Book-Author'])
 
 | **Aspek**                  | **Collaborative Filtering**                | **Content-Based Filtering**             |
 |----------------------------|-------------------------------------------|-----------------------------------------|
-| **Kolom Utama**            | `User-ID`, `ISBN`, `Book-Rating`          | `Book-Title`, `Book-Author`, `metadata` |
+| **Kolom Utama**            | `user_idx`, `book_idx`, `Book-Rating`     | `metadata`, `Book-Title`               |
+| **Format Rating**           | Dinormalisasi ke skala 0-1               | Tidak digunakan                        |
+| **Representasi Buku**       | Berdasarkan interaksi pengguna           | Berdasarkan atribut konten (`metadata`) |
 | **Jumlah Data Akhir**       | 1,031,128 baris                          | 271,353 buku unik                      |
-| **Kegunaan Data**           | Pola interaksi pengguna dan buku          | Kesamaan konten buku berdasarkan penulis|
+
 
 ---
 
