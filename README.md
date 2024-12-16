@@ -160,29 +160,22 @@ Grafik ini menunjukkan 10 pengguna yang paling sering memberikan rating.
 
 ## **Data Preparation**
 
-Tahapan ini menjelaskan langkah-langkah untuk mempersiapkan dataset sebelum digunakan dalam dua metode model rekomendasi: *Collaborative Filtering* dan *Content-Based Filtering*. Data preparation bertujuan untuk membersihkan, mengorganisir, dan menyiapkan dataset agar siap digunakan pada tahap pemodelan.
+Tahapan ini menjelaskan langkah-langkah untuk mempersiapkan dataset sebelum digunakan dalam model *machine learning*. Data preparation bertujuan untuk memastikan data bersih, relevan, dan sesuai dengan kebutuhan masing-masing algoritma yang digunakan, yaitu *Collaborative Filtering* dan *Content-Based Filtering*. Karena kebutuhan kedua metode berbeda, dataset akhir yang digunakan juga berbeda.
 
 ---
 
 ### **1. Identifikasi Masalah Data**
 
-Dataset yang digunakan berasal dari tiga file utama: 
-- **Books.csv**: Informasi detail tentang buku.
-- **Ratings.csv**: Informasi rating yang diberikan oleh pengguna ke buku.
-- **Users.csv**: Informasi detail pengguna.
+Dataset mentah yang digunakan mencakup tiga file utama: `Books.csv`, `Ratings.csv`, dan `Users.csv`. Berikut adalah masalah utama yang ditemukan:
 
-**Masalah Utama**:
-1. **Missing Values**:
-   - `Book-Author` dan `Publisher` di `Books.csv` mengandung nilai kosong.
-   - Kolom `Age` di `Users.csv` memiliki banyak nilai kosong.
-2. **Kolom Tidak Relevan**:
-   - Kolom seperti `Image-URL-S`, `Image-URL-M`, dan `Image-URL-L` tidak diperlukan.
-3. **Duplikasi Data**:
-   - Perlu memastikan tidak ada data duplikat.
-4. **Format Data**:
-   - Kolom `User-ID` dan `ISBN` perlu dienkode untuk *Collaborative Filtering*.
-5. **Penyatuan Data**:
-   - Dataset `Books.csv`, `Ratings.csv`, dan `Users.csv` harus digabungkan.
+1. **Missing Values**  
+   - Kolom seperti `Book-Author` dan `Image-URL-L` di `Books.csv` mengandung nilai kosong.
+2. **Redundansi Kolom**  
+   - Kolom seperti `Image-URL-S`, `Image-URL-M`, dan `Image-URL-L` tidak relevan untuk pembuatan model rekomendasi.
+3. **Format Data**  
+   - Kolom seperti `User-ID` dan `ISBN` perlu dienkode menjadi numerik untuk kebutuhan *collaborative filtering*.
+4. **Outliers**  
+   - Kolom `Age` di `Users.csv` mengandung nilai yang tidak realistis seperti `0` dan angka yang sangat besar.
 
 ---
 
